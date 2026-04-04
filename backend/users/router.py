@@ -12,7 +12,7 @@ async def register( user:UserCreate,db: AsyncSession = Depends(get_db)):
     await register_user(db,user)
     return UserResponse(status_code=201,message="User Created Successfully")
 
-# Dummy endpoint to test JWT Verification
+# Refreshing user data
 @router.get("/me", response_model=UserDataResponse)
 async def get_me(user=Depends(get_current_user)):
     return UserDataResponse(status_code=200,message="User fetched successfully",data=user)
