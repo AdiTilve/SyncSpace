@@ -19,11 +19,9 @@ async def get_user_by_email(db: AsyncSession, email:str):
 
 # Fetching a user from DB by user ID
 async def get_user_by_userId(db:AsyncSession,user_Id):
-    print("Got ID:",user_Id)
     result=await db.execute(
         select(User).where(User.id==user_Id)
         )
-    print("result:",result)
     return result.scalar_one_or_none()
 
 # Updating the passowrd of a user

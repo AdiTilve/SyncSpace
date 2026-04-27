@@ -55,7 +55,7 @@ async def test_register_extra_field(client):
     payload = {
         "first_name": "aditya",
         "last_name": "Tilve",
-         "email": "test8@gmail.com",
+        "email": "test8@gmail.com",
         "password": "test1234",
         "mobile":"123456789"
     }
