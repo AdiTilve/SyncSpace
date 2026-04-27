@@ -1,4 +1,5 @@
 from fastapi import APIRouter,Depends
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 from .schemas import LoginRequest,LoginResponse
 from auth.service import login_user
@@ -9,4 +10,11 @@ router = APIRouter()
 @router.post("/login",response_model=LoginResponse)
 async def login(details:LoginRequest, db:AsyncSession=Depends(get_db)):
     user,bearer=await login_user(db,details)
-    return LoginResponse(status_code=200, message="Login Successfull",data=user,token=bearer)
+    if isinstance(bearer, bytes):
+        bearer = bearer.decode("utf-8")
+    return LoginResponse(
+        status_code=200, 
+        message="Login Successfull",
+        data=jsonable_encoder(user), 
+        token=bearer
+    )

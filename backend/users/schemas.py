@@ -1,14 +1,19 @@
-from pydantic import BaseModel,EmailStr,ConfigDict
+from pydantic import BaseModel,EmailStr,ConfigDict,Field
 from datetime import datetime
 from uuid import UUID
 from typing import Optional
 
 # User Creation Schema:
 class UserCreate(BaseModel):
-    first_name:str
-    last_name:str
+    first_name:str = Field(...,min_length=1)
+    last_name:str = Field(...,min_length=1)
     email:EmailStr
-    password:str
+    password:str= Field(...,min_length=8)
+    model_config = {
+
+        "extra": "forbid" 
+
+    }
 
 # User Creation Response Schema
 class UserResponse(BaseModel):
@@ -23,6 +28,7 @@ class UserData(BaseModel):
     last_name:str
     email:EmailStr
     last_login: Optional[datetime]
+    model_config = {"from_attributes": True}
 
 # User data wrapper class
 class UserDataResponse(BaseModel):

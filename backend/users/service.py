@@ -11,6 +11,7 @@ async def register_user(db: AsyncSession,user: UserCreate):
     if existing_user:
         raise HTTPException(status_code=409,detail="User already exists")
     
+    
     hashed_password=hash_password(user.password)
 
     user_data={

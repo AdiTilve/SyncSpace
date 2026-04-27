@@ -1,10 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from users.router import router as users_router
 from users import model
 from auth.router import router as auth_router
 from shared.database import engine,Base
-app=FastAPI()
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,11 +28,61 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def on_startup():
-    await create_tables()
-async def create_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+@app.exception_handler(StarletteHTTPException)
+
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+
+    return JSONResponse(
+
+        status_code=exc.status_code,
+
+        content={
+
+            "status_code": exc.status_code,
+
+            "detail": exc.detail
+
+        }
+
+    )
+
+@app.exception_handler(RequestValidationError)
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+
+    return JSONResponse(
+
+        status_code=422,
+
+        content={
+
+            "status_code": 422,
+
+            "detail": "Invalid input data",
+
+            "errors": exc.errors()   # optional but recommended
+
+        }
+
+    )
+
+@app.exception_handler(Exception)
+
+async def global_exception_handler(request: Request, exc: Exception):
+
+    return JSONResponse(
+
+        status_code=500,
+
+        content={
+
+            "status_code": 500,
+
+            "detail": "Internal server error"
+
+        }
+
+    )
+
 app.include_router(users_router,prefix="/users",tags=["Users"])
 app.include_router(auth_router,prefix="/auth",tags=["Users"])

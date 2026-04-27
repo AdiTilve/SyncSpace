@@ -33,6 +33,10 @@ def create_access_token(data: dict):
     to_encode.update({"exp":expire})
     
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+   
+    # if isinstance(encoded_jwt, bytes):
+    #     encoded_jwt= encoded_jwt.decode("utf-8")
+
     return encoded_jwt
 
 # Verifying the JWT Access Token
