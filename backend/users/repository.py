@@ -13,7 +13,7 @@ async def create_user(db: AsyncSession, user_data: dict):
 # Fetching a specific user from DB by email
 async def get_user_by_email(db: AsyncSession, email:str):
     result= await db.execute(
-        select(User).where(User.email==email)
+        select(User).where(User.email==email.lower())
         )
     return result.scalar_one_or_none()
 

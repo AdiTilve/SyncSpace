@@ -7,11 +7,15 @@ from users.repository import get_user_by_email
 
 # Service function to Validate User and returning token along with User details
 async def login_user(db:AsyncSession,details:LoginRequest):
+    
     existing_user = await get_user_by_email(db,details.email)
+    
     if not existing_user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    
     try:
         is_valid = verify_password(details.password, existing_user.password_hash)
+    
     except Exception as e:
         print("Password verification error:", e)
         is_valid = False
@@ -26,4 +30,3 @@ async def login_user(db:AsyncSession,details:LoginRequest):
     token=create_access_token({"userId":str(existing_user.id)})
     print("token:",token)
     return existing_user,token
-
