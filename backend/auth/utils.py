@@ -34,18 +34,15 @@ def create_access_token(data: dict):
     
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
    
-    # if isinstance(encoded_jwt, bytes):
-    #     encoded_jwt= encoded_jwt.decode("utf-8")
-
     return encoded_jwt
 
 # Verifying the JWT Access Token
 def verify_access_token(token:str):
     try:
-        print("Inside Verify")
         payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
-        print("Payload:",payload)
         return payload.get("userId")
+
+    
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:

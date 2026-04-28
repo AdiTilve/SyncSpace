@@ -15,7 +15,7 @@ from shared.database import Base, get_db
 
 
 
-# 🔥 SQLite test DB (in-memory)
+# SQLite test DB (in-memory)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(
@@ -30,7 +30,7 @@ TestingSessionLocal = async_sessionmaker(
 )
 
 
-# 🔥 Override DB dependency
+# Override DB dependency
 async def override_get_db():
     async with TestingSessionLocal() as session:
         yield session
