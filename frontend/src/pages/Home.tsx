@@ -1,13 +1,30 @@
 import PublicLayout from "@/layouts/PublicLayout"
 import {Button} from "@/components/ui/button"
 import { useNavigate } from 'react-router-dom'
+import api from "../api/axios"
+import toast from "react-hot-toast";
 
 export default function Home() {
 
     const navigate=useNavigate()
 
-    function handleLogout(){
-        localStorage.removeItem("token")
+    async function handleLogout(){
+        const token = localStorage.getItem("token");
+         const response = await api.post(
+
+      "/auth/logout",
+
+      {},
+      {
+        headers: {
+
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    toast.success(response.data.message)
+    localStorage.removeItem("token")
+
         navigate("/login", { replace: true })
     }
 
