@@ -13,7 +13,6 @@ export default function Home() {
          const response = await api.post(
 
       "/auth/logout",
-
       {},
       {
         headers: {
