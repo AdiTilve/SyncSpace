@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
-import axios from "axios"
+import api from "../api/axios"
+import toast from "react-hot-toast";
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false)
@@ -17,8 +18,6 @@ export default function Login() {
         email?: string
         password?: string
     }>({})
-    const [message, setMessage] = useState("")
-    // const [messageType, setMessageType] = useState("")
     const navigate = useNavigate()
 
     // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000"
@@ -51,21 +50,21 @@ export default function Login() {
         if (!validateLogin()) return
         try{
 
-           const response= await axios.post(
-            "http://127.0.0.1:8000/auth/login",
+           const response= await api.post(
+            "/auth/login",
         {
             email,
             password
         })
             // setMessage(response.data.message)
             // setMessageType("success")
-            
+            toast.success(response.data.message)
             localStorage.setItem("token",response.data.token)
             // console.log(localStorage.getItem("token"))
             navigate("/home")
         }
         catch(error:any){
-            setMessage(error.response.data.detail)
+            toast.error(error.response.data.detail)
             // setMessageType("error")
         }
     }
@@ -80,13 +79,6 @@ export default function Login() {
                 }}
                 noValidate
             >
-<p className="text-sm text-center text-red-400"
-                    // className={`text-sm text-center ${
-                    // messageType === "success" ? "text-green-400" : "text-red-400"
-                    // }`}
-                >
-                    {message}
-                </p>
                 {/* Heading */}
                 <h2 className="text-xl sm:text-2xl font-semibold text-center">Login</h2>
 

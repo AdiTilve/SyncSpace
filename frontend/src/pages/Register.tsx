@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
+import api from "../api/axios"
 import { useNavigate } from 'react-router-dom'
-import axios from "axios"
+import toast from "react-hot-toast";
+
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false)
@@ -23,8 +25,6 @@ export default function Register() {
         password?: string
         confirmPassword?: string
     }>({})
-    const [message, setMessage] = useState("")
-    const [messageType, setMessageType] = useState("")
     const navigate = useNavigate()
 
     function validateRegister() {
@@ -74,18 +74,17 @@ export default function Register() {
 
     try {
         console.log("User Submitted")
-        const response= await axios.post("http://127.0.0.1:8000/users/register", {
+        const response= await api.post("/users/register", {
                 first_name,
                 last_name,
                 email,
                 password,
             })
-        setMessage(response.data.message)
-        setMessageType("success")
+        toast.success(response.data.message)
+        navigate("/login")
 
     } catch (error:any) {
-        setMessage(error.response.data.detail)
-        setMessageType("error")
+        toast.error(error.response.data.detail)
     }
 }
 
@@ -99,13 +98,6 @@ export default function Register() {
                 }}
                 noValidate
             >
-                <p
-                    className={`text-sm text-center ${
-                    messageType === "success" ? "text-green-400" : "text-red-400"
-                    }`}
-                >
-                    {message}
-                </p>
                 {/* Heading */}
                 <h2 className="text-xl sm:text-2xl font-semibold text-center">Register</h2>
 
