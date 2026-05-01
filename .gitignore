@@ -15,6 +15,9 @@ downloads/
 eggs/
 .eggs/
 lib/
+# Exception for frontend lib
+!frontend/src/lib/
+!frontend/src/lib/**
 lib64/
 parts/
 sdist/
