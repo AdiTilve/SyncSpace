@@ -106,7 +106,7 @@ export default function Login() {
                     <div className="relative">
                         <Input
                             type={showPassword ? "text" : "password"}
-                            placeholder="Create a password"
+                            placeholder="Enter password"
                             value={password}
                             onChange={(event) => {
                                 setPassword(event.target.value)
