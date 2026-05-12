@@ -20,10 +20,10 @@ print("URL:", DATABASE_URL)
 ssl_context = ssl.create_default_context()
 # Creating Async Engine
 engine = create_async_engine(
-    DATABASE_URL,
-    connect_args={"ssl": ssl_context}
+    DATABASE_URL
+    # connect_args={"ssl": ssl_context}
 )
-
+print("Connected")
 # Creating Session
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
