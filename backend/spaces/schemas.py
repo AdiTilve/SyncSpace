@@ -1,8 +1,8 @@
-from pydantic import BaseModel,Field, EmailStr
+from pydantic import BaseModel,Field, EmailStr,ConfigDict
 from datetime import datetime
 from uuid import UUID
 from typing import Optional
-from model import MemberRole, DocumentType
+from spaces.model import MemberRole, DocumentType
 
 
 # Space Schemas 
@@ -14,6 +14,8 @@ class SpaceUpdate(BaseModel):
     name: str = Field(..., min_length=1)
 
 class SpaceData(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     name: str
     created_at: datetime
@@ -47,10 +49,11 @@ class DocumentUpdate(BaseModel):
     content  : Optional[dict] = None
 
 class DocumentData(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     type : DocumentType
     title : str 
-    is_owner: bool
+    is_owner: bool = None
     content  : Optional[dict] = None
     created_at: datetime
     role: Optional[MemberRole] = None

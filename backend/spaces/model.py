@@ -1,11 +1,16 @@
 from shared.database import Base
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Enum, UniqueConstraint
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Enum, UniqueConstraint, JSON
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy import Index
 import uuid
 import enum
 from datetime import datetime, timezone
+import os
 
+def get_json_type():
+    if os.getenv("TESTING") == "true":
+        return JSON()
+    return JSONB()
 
 # Enums
 class DocumentType(enum.Enum):
@@ -41,7 +46,7 @@ class Document(Base):
     owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     title = Column(String(255), nullable=False)
     type = Column(Enum(DocumentType), nullable=False)
-    content = Column(JSONB, default=None)
+    content = Column(get_json_type(), default=None)
     parent_document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), default=None)
     is_deleted = Column(Boolean, default=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
@@ -59,7 +64,7 @@ class DocumentMember(Base):
     document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     role = Column(Enum(MemberRole), nullable=False)
-    permissions = Column(JSONB, default=None)
+    permissions = Column(get_json_type(), default=None)
     invited_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc), onupdate= datetime.now(timezone.utc))
@@ -75,7 +80,7 @@ class SpaceMember(Base):
     space_id = Column(UUID(as_uuid=True), ForeignKey("spaces.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     role = Column(Enum(MemberRole), nullable=False)
-    permissions = Column(JSONB, default=None)
+    permissions = Column(get_json_type(), default=None)
     invited_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

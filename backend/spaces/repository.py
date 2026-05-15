@@ -1,10 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import  select, update , delete
-from model import Space, SpaceMember, Document, DocumentMember
+from spaces.model import Space, SpaceMember, Document, DocumentMember
 from users.model import User
 from uuid import UUID
-from schemas import SpaceCreate, SpaceUpdate, DocumentCreate, DocumentUpdate
-from schemas import SpaceMemberUpdate, DocumentMemberUpdate, SpaceMemberCreate, DocumentMemberCreate
+from spaces.schemas import SpaceCreate, SpaceUpdate, DocumentCreate, DocumentUpdate
+from spaces.schemas import SpaceMemberUpdate, DocumentMemberUpdate, SpaceMemberCreate, DocumentMemberCreate
 
 # Space methods
 async def create_space(db: AsyncSession, space_data: SpaceCreate, user_id: UUID):
@@ -151,7 +151,7 @@ async def get_shared_document_by_id(db: AsyncSession, document_id: UUID, user_id
         select(Document, DocumentMember.role)
         .join(DocumentMember, DocumentMember.document_id == Document.id)
         .where(
-            DocumentMember.space_id == document_id,
+            DocumentMember.document_id == document_id,
             DocumentMember.user_id == user_id,
             Document.is_deleted == False
         )
