@@ -5,7 +5,7 @@ from .schemas import LoginRequest,LoginResponse,LogoutResponse
 from auth.service import login_user
 from shared.database import get_db
 from .dependencies import get_current_user
-
+from users.model import User
 router = APIRouter()
 
 # User Login Endpoint 
@@ -23,5 +23,5 @@ async def login(details:LoginRequest, db:AsyncSession=Depends(get_db)):
 
 # User Logout
 @router.post("/logout",response_model=LogoutResponse)
-async def logout(user=Depends(get_current_user)):
+async def logout(user: User=Depends(get_current_user)):
     return LogoutResponse(status_code=200,message="Logged out Successfully")
