@@ -6,12 +6,6 @@ from dotenv import load_dotenv
 from urllib.parse import quote_plus
 
 load_dotenv()
-
-# Loading database connection related properties from environment
-# pg_user=os.getenv("POSTGRES_USER")
-# pg_password=quote_plus(os.getenv('POSTGRES_PASSWORD'))
-# pg_dbname=os.getenv('POSTGRES_DB')
-
 # Database connectivity URL 
 DATABASE_URL= os.getenv('DATABASE_URL')
 #Debugging
@@ -19,13 +13,13 @@ print("URL:", DATABASE_URL)
 
 ssl_context = ssl.create_default_context()
 # Creating Async Engine
-engine = create_async_engine(
+if os.getenv('TESTING') != 'true':
+    engine = create_async_engine(
     DATABASE_URL
     # connect_args={"ssl": ssl_context}
-)
-print("Connected")
-# Creating Session
-SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+    )
+    # Creating Session
+    SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 
 # Base class to keep track of schemas for future migration
