@@ -6,21 +6,18 @@ from dotenv import load_dotenv
 from urllib.parse import quote_plus
 
 load_dotenv()
-# Database connectivity URL 
-DATABASE_URL= os.getenv('DATABASE_URL')
-#Debugging
+
+DATABASE_URL = os.getenv('DATABASE_URL')
 print("URL:", DATABASE_URL)
 
 ssl_context = ssl.create_default_context()
-# Creating Async Engine
-if os.getenv('TESTING') != 'true':
-    engine = create_async_engine(
-    DATABASE_URL
-    # connect_args={"ssl": ssl_context}
-    )
-    # Creating Session
-    SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
+engine = create_async_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if DATABASE_URL and "sqlite" in DATABASE_URL else {},
+)
+
+SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 # Base class to keep track of schemas for future migration
 class Base(DeclarativeBase):
