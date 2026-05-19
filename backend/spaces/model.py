@@ -31,8 +31,8 @@ class Space(Base):
     name = Column(String(255), nullable=False)
     owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     is_deleted = Column(Boolean, default=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     __table_args__ = (
         Index('idx_spaces_owner_name', 'owner_id', 'name'),
     )
@@ -49,8 +49,8 @@ class Document(Base):
     content = Column(get_json_type(), default=None)
     parent_document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), default=None)
     is_deleted = Column(Boolean, default=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     __table_args__ = (
     Index('idx_documents_space_title', 'space_id', 'title'),
@@ -66,8 +66,8 @@ class DocumentMember(Base):
     role = Column(Enum(MemberRole), nullable=False)
     permissions = Column(get_json_type(), default=None)
     invited_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc), onupdate= datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc), onupdate= datetime.now(timezone.utc))
 
     __table_args__ = (UniqueConstraint("document_id", "user_id"),)
 
@@ -82,7 +82,7 @@ class SpaceMember(Base):
     role = Column(Enum(MemberRole), nullable=False)
     permissions = Column(get_json_type(), default=None)
     invited_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     __table_args__ = (UniqueConstraint("space_id", "user_id"),)
