@@ -14,6 +14,8 @@ ssl_context = ssl.create_default_context()
 
 engine = create_async_engine(
     DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
     connect_args={"check_same_thread": False} if DATABASE_URL and "sqlite" in DATABASE_URL else {},
 )
 
