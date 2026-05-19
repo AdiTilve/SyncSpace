@@ -86,3 +86,4 @@ class SpaceMember(Base):
     updated_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     __table_args__ = (UniqueConstraint("space_id", "user_id"),)
+    
