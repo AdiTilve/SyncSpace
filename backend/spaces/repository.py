@@ -57,7 +57,9 @@ async def get_shared_space_by_id(db: AsyncSession, space_id: UUID, user_id: UUID
 
 async def get_all_spaces(db: AsyncSession, user_id: UUID):
     result= await db.execute(
-        select(Space).where(Space.owner_id == user_id, Space.is_deleted == False)
+        select(Space)
+        .where(Space.owner_id == user_id, Space.is_deleted == False)
+        .order_by(Space.created_at.desc())
     )
     spaces = result.scalars().all()
     return [{"space": space, "is_owner": True, "role": None}
@@ -139,7 +141,9 @@ async def get_document_by_id(db: AsyncSession, document_id: UUID, user_id: UUID)
 
 async def get_all_documents(db: AsyncSession, space_id: UUID, user_id: UUID):
     result= await db.execute(
-        select(Document).where(Document.space_id == space_id, Document.owner_id == user_id, Document.is_deleted == False)
+        select(Document)
+        .where(Document.space_id == space_id, Document.owner_id == user_id, Document.is_deleted == False)
+        .order_by(Document.created_at.desc())
     )
     documents = result.all()
     return [{"document": document, "is_owner": True, "role": None}
