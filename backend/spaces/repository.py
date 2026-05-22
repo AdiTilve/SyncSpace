@@ -145,7 +145,7 @@ async def get_all_documents(db: AsyncSession, space_id: UUID, user_id: UUID):
         .where(Document.space_id == space_id, Document.owner_id == user_id, Document.is_deleted == False)
         .order_by(Document.created_at.desc())
     )
-    documents = result.all()
+    documents = result.scalars().all()
     return [{"document": document, "is_owner": True, "role": None}
             for document in documents
             ]
