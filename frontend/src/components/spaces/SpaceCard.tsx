@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react"
 import type { Space } from "@/types/space"
-import { useSpaceStore } from "@/store/SpaceStore"
 import { useNavigate } from "react-router-dom"
 interface SpaceCardProps {
     space: Space
