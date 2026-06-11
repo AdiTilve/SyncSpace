@@ -10,6 +10,7 @@ from auth.router import router as auth_router
 from spaces.router import router as spaces_router
 from shared.database import engine,Base
 from contextlib import asynccontextmanager
+from fastapi.middleware.gzip import GZipMiddleware
 import os
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(GZipMiddleware, minimum_size=1000) # Compresses everything over 1KB
 
 origins = os.getenv("ALLOWED_ORIGINS")
 
