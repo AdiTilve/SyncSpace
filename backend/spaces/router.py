@@ -133,6 +133,7 @@ async def get_document_by_id(space_id:UUID, document_id:UUID, db:AsyncSession=De
         id=result["document"].id,
         type=result["document"].type,
         title=result["document"].title,
+        content=result["document"].content,
         is_owner=result["is_owner"],
         created_at=result["document"].created_at,
         role=result["role"],

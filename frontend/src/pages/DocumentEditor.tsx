@@ -11,44 +11,78 @@ export default function DocumentEditor() {
     const [title, setTitle] = useState("")
     const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved")
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    
+    // Track if the document has completed its initial database fetch
+    const isInitialLoad = useRef(true)
 
     const editor = useEditor({
         extensions: [StarterKit],
         content: "",
         onUpdate: ({ editor }) => {
+            // STRICT GATE: Do absolutely nothing if the initial payload hasn't completed loading
+            if (isInitialLoad.current) return
+
             setSaveStatus("unsaved")
             if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
             saveTimerRef.current = setTimeout(() => {
-                saveContent(editor.getJSON())
+                saveContent(editor.getJSON(), title)
             }, 3000)
         }
     })
 
-    // Fetch document when editor is ready
+    // Fetch document data on mount or if routes shift
     useEffect(() => {
+        let isMounted = true
+
         async function fetchDocument() {
             try {
                 const response = await api.get(`/spaces/${space_id}/documents/${document_id}`)
                 const doc = response.data.data
+                console.log(doc)
+                if (!isMounted) return
+
                 setTitle(doc.title)
-                if (editor && doc.content) {
-                    editor.commands.setContent(doc.content)
+                
+                if (editor) {
+                    if (doc.content && (typeof doc.content === "object" || doc.content.length > 0)) {
+                        // Load the valid rich-text JSON schema payload from database
+                        editor.commands.setContent(doc.content)
+                    } else {
+                        // Fallback fallback if the text layer is unpopulated
+                        editor.commands.setContent("<p></p>")
+                    }
+                    
+                    // Unlatch the execution gate slightly after TipTap tree processes synthetic events
+                    setTimeout(() => {
+                        if (isMounted) {
+                            isInitialLoad.current = false
+                        }
+                    }, 100)
                 }
-            } catch {
+            } catch (error) {
+                console.error("Error pulling document state:", error)
                 navigate(`/spaces/${space_id}/documents`)
             }
         }
+
         if (editor) {
             fetchDocument()
         }
-    }, [editor])
 
-    // Save content function
-    async function saveContent(content: any) {
+        return () => {
+            isMounted = false
+        }
+    }, [editor, space_id, document_id, navigate])
+
+    // Save content and title utility function
+    async function saveContent(content: any, currentTitle: string) {
+        // Safety lock out to prevent network race conditions overrides
+        if (isInitialLoad.current) return
+
         setSaveStatus("saving")
         try {
             await api.patch(`/spaces/${space_id}/documents/${document_id}`, {
-                title,
+                title: currentTitle,
                 content
             })
             setSaveStatus("saved")
@@ -57,16 +91,18 @@ export default function DocumentEditor() {
         }
     }
 
-    // Save on tab close
+    // Save on browser tab closure context
     useEffect(() => {
         function handleBeforeUnload() {
-            if (editor) saveContent(editor.getJSON())
+            if (editor && !isInitialLoad.current) {
+                saveContent(editor.getJSON(), title)
+            }
         }
         window.addEventListener("beforeunload", handleBeforeUnload)
         return () => window.removeEventListener("beforeunload", handleBeforeUnload)
     }, [editor, title])
 
-    // Cleanup timer on unmount
+    // Clean up debounced scheduler timers on component lifecycle termination
     useEffect(() => {
         return () => {
             if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
@@ -93,12 +129,17 @@ export default function DocumentEditor() {
                             type="text"
                             value={title}
                             onChange={(e) => {
-                                setTitle(e.target.value)
-                                setSaveStatus("unsaved")
-                                if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
-                                saveTimerRef.current = setTimeout(() => {
-                                    if (editor) saveContent(editor.getJSON())
-                                }, 3000)
+                                const newTitle = e.target.value
+                                setTitle(newTitle)
+                                
+                                // Only trigger text tracking auto-saves if initial load is finished
+                                if (!isInitialLoad.current) {
+                                    setSaveStatus("unsaved")
+                                    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+                                    saveTimerRef.current = setTimeout(() => {
+                                        if (editor) saveContent(editor.getJSON(), newTitle)
+                                    }, 3000)
+                                }
                             }}
                             className="text-xl font-semibold bg-transparent border-none outline-none text-white placeholder-slate-500"
                             placeholder="Untitled"
