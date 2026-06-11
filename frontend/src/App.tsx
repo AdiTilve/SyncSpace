@@ -42,14 +42,11 @@ function App() {
                         <Documents />
                     </ProtectedRoute>
                 } />
-<<<<<<< HEAD
-=======
                 <Route path="/spaces/:space_id/documents/:document_id" element={
                     <ProtectedRoute>
                         <DocumentEditor />
                     </ProtectedRoute>
                 } />
->>>>>>> bc75a29 (Added the frontend files for document and spaces)
             </Routes>
         </BrowserRouter>
     )
