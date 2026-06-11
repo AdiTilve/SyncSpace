@@ -107,7 +107,8 @@ async def create_document_service(db:AsyncSession, document_data: DocumentCreate
     return result
 
 async def update_document_service(db:AsyncSession, document_data:DocumentUpdate, space_id: UUID, document_id:UUID, user_id: UUID):
-    document_data.title = document_data.title.strip()
+    if document_data.title is not None:
+        document_data.title = document_data.title.strip()
 
     if len(document_data.title)<1:
         raise HTTPException(status_code=422,detail="Document name cannot be empty")
