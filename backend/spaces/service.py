@@ -127,7 +127,7 @@ async def update_document_service(db:AsyncSession, document_data:DocumentUpdate,
     
     existing_document= await get_document_by_name(db,document_data.title,space_id)
     
-    if existing_document:
+    if existing_document and existing_document.id != document_id:
         raise HTTPException(status_code=409,detail="Document already exists")
     
     result= await update_document(db,document_id,document_data)
