@@ -7,6 +7,7 @@ import Home from "@/pages/Home"
 import Documents from "@/pages/Documents"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import PublicRoute from "@/components/PublicRoute"
+import DocumentEditor from "@/pages/DocumentEditor"
 
 function App() {
     return (
@@ -41,6 +42,14 @@ function App() {
                         <Documents />
                     </ProtectedRoute>
                 } />
+<<<<<<< HEAD
+=======
+                <Route path="/spaces/:space_id/documents/:document_id" element={
+                    <ProtectedRoute>
+                        <DocumentEditor />
+                    </ProtectedRoute>
+                } />
+>>>>>>> bc75a29 (Added the frontend files for document and spaces)
             </Routes>
         </BrowserRouter>
     )

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import type { Document } from "@/types/document"
+import { useNavigate, useParams } from "react-router-dom"
 
 interface DocumentCardProps {
     doc: Document
@@ -10,7 +11,8 @@ interface DocumentCardProps {
 export default function DocumentCard({ doc, onEdit,onDelete }: DocumentCardProps) {
     const [menuOpen, setMenuOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
-
+    const navigate = useNavigate()
+    const { space_id } = useParams()
     // Close menu when clicking outside
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
@@ -31,7 +33,7 @@ export default function DocumentCard({ doc, onEdit,onDelete }: DocumentCardProps
     }
 
     return (
-        <div className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 hover:border-slate-700 transition-colors">
+        <div onClick={() => navigate(`/spaces/${space_id}/documents/${doc.id}`)} className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 hover:border-slate-700 transition-colors">
 
             {/* Left - Name */}
             <div className="flex flex-col">
@@ -61,7 +63,7 @@ export default function DocumentCard({ doc, onEdit,onDelete }: DocumentCardProps
                 </span>
 
                 {/* Three Dots Menu */}
-                <div className="relative" ref={menuRef}>
+                <div className="relative" ref={menuRef} onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={() => setMenuOpen((prev) => !prev)}
                         className="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-800 transition-colors text-lg"
