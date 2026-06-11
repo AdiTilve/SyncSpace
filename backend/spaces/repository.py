@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import  select, update , delete
+from sqlalchemy.orm.attributes import flag_modified
 from spaces.model import Space, SpaceMember, Document, DocumentMember
 from users.model import User
 from uuid import UUID
@@ -203,7 +204,15 @@ async def update_document(db: AsyncSession, document_id: UUID, document_data: Do
     document = result.scalar_one_or_none()
     
     if document:
-        document.title = document_data.title
+        update_dict = document_data.model_dump(exclude_unset=True)
+        
+        for key, value in update_dict.items():
+            setattr(document, key, value)
+            
+        # 2. CRITICAL FOR NEON/POSTGRES JSONB: 
+        # Explicitly tell SQLAlchemy that the content dictionary was modified
+        if "content" in update_dict:
+            flag_modified(document, "content")
         await db.commit()
         await db.refresh(document)
     return document
