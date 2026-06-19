@@ -7,8 +7,8 @@ from users.repository import get_user_by_userId
 from uuid import UUID
 from spaces.repository import (
     get_space_by_name, create_space, get_space_by_id, update_space, create_document,
-    get_document_by_name, delete_space, delete_document_by_space_id, get_all_spaces, 
-    get_all_shared_spaces,get_shared_space_by_id, update_document, get_document_by_id, 
+    get_document_by_name, delete_space, delete_document_by_space_id, fetch_spaces_from_db, 
+    fetch_all_shared_spaces_from_db,get_shared_space_by_id, update_document, get_document_by_id, 
     delete_document, get_all_documents,get_all_shared_documents, get_shared_document_by_id,
     document_member_add, get_document_member, document_member_update, document_member_remove,
     get_all_document_member)
@@ -76,11 +76,11 @@ async def get_shared_space_by_id_service(db: AsyncSession, space_id: UUID, user_
     return result
 
 async def get_all_spaces_service(db: AsyncSession, user_id: UUID):
-    result = await get_all_spaces(db, user_id)
+    result = await fetch_spaces_from_db(db, user_id)
     return result
 
 async def get_all_shared_spaces_service(db: AsyncSession,user_id: UUID):
-    result = await get_all_shared_spaces(db,user_id)
+    result = await fetch_all_shared_spaces_from_db(db,user_id)
     return result
 
 
