@@ -56,7 +56,7 @@ async def get_shared_space_by_id(db: AsyncSession, space_id: UUID, user_id: UUID
         "role": role
     }
 
-async def get_all_spaces(db: AsyncSession, user_id: UUID):
+async def fetch_spaces_from_db(db: AsyncSession, user_id: UUID):
     result= await db.execute(
         select(Space)
         .where(Space.owner_id == user_id, Space.is_deleted == False)
@@ -67,7 +67,7 @@ async def get_all_spaces(db: AsyncSession, user_id: UUID):
             for space in spaces
             ]
     
-async def get_all_shared_spaces(db: AsyncSession,user_id: UUID):
+async def fetch_all_shared_spaces_from_db(db: AsyncSession,user_id: UUID):
     result = await db.execute(
         select(Space, SpaceMember.role)
         .join(SpaceMember, SpaceMember.space_id == Space.id)

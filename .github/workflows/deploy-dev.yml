@@ -1,12 +1,14 @@
-name: Deploy to Dev
+name: Deploy App Pipeline
 
 on:
   push:
     branches:
       - develop
+      - main
   pull_request:
     branches:
       - develop
+      - main
 
 jobs:
   test:
@@ -42,7 +44,7 @@ jobs:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push' # ← only deploy on push not PR
+    if: github.event_name == 'push'
 
     permissions:
       contents: read
@@ -51,6 +53,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # Sets up environment context variables while pointing to your unified registry
+      - name: Set Environment Variables
+        id: env_setup
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "tag_prefix=prod" >> $GITHUB_OUTPUT
+            echo "service_name=syncspace-backend-prod" >> $GITHUB_OUTPUT
+          else
+            echo "tag_prefix=dev" >> $GITHUB_OUTPUT
+            echo "service_name=syncspace-backend-dev" >> $GITHUB_OUTPUT
+          fi
 
       - name: Authenticate to GCP
         id: auth
@@ -70,15 +84,17 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      # Builds and pushes directly into the syncspace-dev repository folder using custom tags
       - name: Build and Push Docker Image
         run: |
-          docker build -t asia-southeast1-docker.pkg.dev/syncspace-backend/syncspace-dev/syncspace-backend:${{ github.sha }} ./backend
-          docker push asia-southeast1-docker.pkg.dev/syncspace-backend/syncspace-dev/syncspace-backend:${{ github.sha }}
+          docker build -t asia-southeast1-docker.pkg.dev/syncspace-backend/syncspace-dev/syncspace-backend:${{ steps.env_setup.outputs.tag_prefix }}-${{ github.sha }} ./backend
+          docker push asia-southeast1-docker.pkg.dev/syncspace-backend/syncspace-dev/syncspace-backend:${{ steps.env_setup.outputs.tag_prefix }}-${{ github.sha }}
 
+      # Triggers deployment targeting the environment-specific Cloud Run service instance
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy syncspace-backend-dev \
-            --image=asia-southeast1-docker.pkg.dev/syncspace-backend/syncspace-dev/syncspace-backend:${{ github.sha }} \
+          gcloud run deploy ${{ steps.env_setup.outputs.service_name }} \
+            --image=asia-southeast1-docker.pkg.dev/syncspace-backend/syncspace-dev/syncspace-backend:${{ steps.env_setup.outputs.tag_prefix }}-${{ github.sha }} \
             --region=asia-south1 \
             --project=syncspace-backend \
             --platform=managed
