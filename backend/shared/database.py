@@ -7,26 +7,19 @@ from urllib.parse import quote_plus
 
 load_dotenv()
 
-# Loading database connection related properties from environment
-# pg_user=os.getenv("POSTGRES_USER")
-# pg_password=quote_plus(os.getenv('POSTGRES_PASSWORD'))
-# pg_dbname=os.getenv('POSTGRES_DB')
-
-# Database connectivity URL 
-DATABASE_URL= os.getenv('DATABASE_URL')
-#Debugging
+DATABASE_URL = os.getenv('DATABASE_URL')
 print("URL:", DATABASE_URL)
 
 ssl_context = ssl.create_default_context()
-# Creating Async Engine
+
 engine = create_async_engine(
     DATABASE_URL,
-    connect_args={"ssl": ssl_context}
+    pool_pre_ping=True,
+    pool_recycle=300,
+    connect_args={"check_same_thread": False} if DATABASE_URL and "sqlite" in DATABASE_URL else {},
 )
 
-# Creating Session
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
-
 
 # Base class to keep track of schemas for future migration
 class Base(DeclarativeBase):

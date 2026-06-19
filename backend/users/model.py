@@ -1,8 +1,8 @@
 from shared.database import Base
-from sqlalchemy import Column, String,Boolean, DateTime
+from sqlalchemy import Column, String,Boolean, DateTime, Index
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from datetime import datetime
+from datetime import datetime,timezone
 
 # User Structure
 class User(Base):
@@ -20,6 +20,8 @@ class User(Base):
     is_deleted=Column(Boolean,default=False)
 
     last_login=Column(DateTime,nullable=True)
-    created_at=Column(DateTime,nullable=False, default=datetime.utcnow)
-    updated_at=Column(DateTime,nullable=False, default=datetime.utcnow,onupdate=datetime.utcnow)
-    
+    created_at=Column(DateTime,nullable=False, default=datetime.now(timezone.utc))
+    updated_at=Column(DateTime,nullable=False, default=datetime.now(timezone.utc),onupdate=datetime.now(timezone.utc))
+    __table_args__ = (
+    Index('idx_users_email', 'email'),
+)

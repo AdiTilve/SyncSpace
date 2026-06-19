@@ -7,8 +7,8 @@ from datetime import datetime, timedelta, timezone
 async def test_login_returns_token(client,setup_test_user):
     
     payload = {
-        "email": "test7@gmail.com",
-        "password": "test1234"
+        "email": setup_test_user["email"],
+        "password": setup_test_user["password"]
     }
 
     response = await client.post("/auth/login",json=payload)
@@ -25,8 +25,8 @@ async def test_login_returns_token(client,setup_test_user):
 
 async def test_login_token_payload(client,setup_test_user):
     payload = {
-        "email": "test7@gmail.com",
-        "password": "test1234"
+        "email": setup_test_user["email"],
+        "password": setup_test_user["password"]
     }
 
     response = await client.post("/auth/login",json=payload)
@@ -66,8 +66,8 @@ async def test_invalid_token_access(client):
 @pytest.mark.asyncio
 async def test_valid_token_access(client, setup_test_user):
     payload = {
-        "email": "test7@gmail.com",
-        "password": "test1234"
+        "email": setup_test_user["email"],
+        "password": setup_test_user["password"]
     }
 
     login_response = await client.post("/auth/login", json=payload)
@@ -109,8 +109,8 @@ async def test_expired_token_access(client):
 async def test_logout_success(client, setup_test_user):
     
     login_payload = {
-        "email": "test7@gmail.com",
-        "password": "test1234"
+        "email": setup_test_user["email"],
+        "password": setup_test_user["password"]
     }
 
     login_response = await client.post("/auth/login", json=login_payload)
