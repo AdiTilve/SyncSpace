@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState} from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import type { ReactNode } from "react"
 
 type Theme = "dark" | "light"
@@ -14,7 +14,6 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    // Read previous settings from localStorage, fallback to signature dark mode
     const [theme, setTheme] = useState<Theme>(() => {
         return (localStorage.getItem("syncspace-theme") as Theme) || "dark"
     })
@@ -22,7 +21,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         return (localStorage.getItem("syncspace-font-size") as FontSize) || "base"
     })
 
-    // Sync theme adjustments directly onto the main HTML element class list
+    // Apply theme to html element
     useEffect(() => {
         const root = window.document.documentElement
         root.classList.remove("light", "dark")
@@ -30,10 +29,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("syncspace-theme", theme)
     }, [theme])
 
-    // Sync font size tracking to localStorage
+    // Apply font size via CSS variable
     useEffect(() => {
+        const sizeMap = {
+            sm: "14px",
+            base: "16px",
+            lg: "18px",
+            xl: "20px"
+        }
+        document.documentElement.style.setProperty("--font-size-base", sizeMap[fontSize])
         localStorage.setItem("syncspace-font-size", fontSize)
     }, [fontSize])
+
+    // Apply saved font size on initial load
+    useEffect(() => {
+        const sizeMap = {
+            sm: "14px",
+            base: "16px",
+            lg: "18px",
+            xl: "20px"
+        }
+        document.documentElement.style.setProperty("--font-size-base", sizeMap[fontSize])
+    }, [])
 
     const toggleTheme = () => {
         setTheme((prev) => (prev === "dark" ? "light" : "dark"))
